@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { register } from '../redux/features/register/registerSlice'
+import Supabase from '../db/supabase'
 import {
   ThemeProvider,
   createTheme,
@@ -12,7 +13,9 @@ import {
   Typography,
   TextField,
   Button,
-  Link
+  Link,
+  Snackbar,
+  Alert
 } from '@mui/material'
 
 const theme = createTheme({
@@ -28,6 +31,7 @@ const theme = createTheme({
 const Register = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const [showAlert, setShowAlert] = useState(false)
 
   const { user } = useSelector(state => state.register)
   console.log(user)
@@ -37,7 +41,31 @@ const Register = () => {
   const [password, setPassword] = useState('')
   const [phone, setPhone] = useState('')
 
-  const handleRegister = () => {
+  const handleCloseAlert = () => {
+    setShowAlert(false)
+  }
+
+const handleRegister = async () => {
+  const { data , error } = await Supabase.auth.signUp({
+    email: email,
+    password: password,
+    options: {
+      data: {
+        username: username,
+        phone: phone
+      }
+    }
+  })
+  console.log(data)
+  if (error) {
+    console.log(error)
+  } else {
+    setShowAlert(true)
+  }
+}
+ 
+
+  /*const handleRegister = () => {
     const user = {
       username,
       email,
@@ -45,7 +73,7 @@ const Register = () => {
       phone
     }
     dispatch(register(user))
-  }
+  }*/
 
   return (
     <ThemeProvider theme={theme}>
@@ -145,6 +173,20 @@ const Register = () => {
           </CardContent>
         </Card>
       </Box>
+      <Snackbar 
+        open={showAlert} 
+        autoHideDuration={2000} 
+        onClose={handleCloseAlert}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={handleCloseAlert} 
+          severity="success" 
+          sx={{ width: '100%' }}
+        >
+          Üye olma işlemi başarıyla tamamlandı! Mailinize doğrulama linki gönderildi.
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   )
 }

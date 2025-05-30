@@ -110,12 +110,13 @@ const Details = () => {
         onClose={() => setCartOpen(false)} 
       />
 
-      <Box sx={{ maxWidth: 1200, mx: 'auto', p: 4 }}>
+      <Box sx={{ maxWidth: 1200, mx: 'auto', p: 4}}>
         <Card sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
           <CardMedia
             component="img"
             sx={{ 
-              width: { xs: '100%', md: '40%' },
+              width: 400,
+              height: 400,
               objectFit: 'contain',
               p: 2
             }}

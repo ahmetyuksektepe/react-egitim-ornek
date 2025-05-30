@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from "react-redux";
 import { login } from '../redux/features/login/loginSlice'
+import { useSession } from '../hooks/SessionContext'
+import Supabase from '../db/supabase'
 import {
   ThemeProvider,
   createTheme,
@@ -12,7 +14,9 @@ import {
   Typography,
   TextField,
   Button,
-  Link
+  Link,
+  Alert,
+  Snackbar
 } from '@mui/material'
 
 const theme = createTheme({
@@ -28,18 +32,40 @@ const theme = createTheme({
 const Login = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const { session } = useSession()
+  const [error, setError] = useState(null)
 
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
-  const handleLogin = () => {
-    dispatch(login(username))
-    navigate('/')
+  // Redirect if already logged in
+  React.useEffect(() => {
+    if (session) {
+      navigate('/')
+    }
+  }, [session, navigate])
+
+  const handleLogin = async () => {
+    try {
+      const { data, error } = await Supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      })
+      
+      if (error) {
+        setError(error.message)
+      } else {
+        dispatch(login(data.user.email))
+        navigate('/')
+      }
+    } catch (err) {
+      setError('Giriş yapılırken bir hata oluştu')
+    }
   }
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      {/* Tam ekran arkaplan gradyanı */}
       <Box
         sx={{
           minHeight: '100vh',
@@ -50,7 +76,6 @@ const Login = () => {
           p: 2
         }}
       >
-        {/* Formu Card içinde göstermek */}
         <Card
           sx={{
             maxWidth: 400,
@@ -70,17 +95,20 @@ const Login = () => {
             </Typography>
 
             <TextField
-              label="Kullanıcı Adı"
-              type="text"
+              label="E-posta"
+              type="email"
               variant="outlined"
               fullWidth
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <TextField
               label="Şifre"
               type="password"
               variant="outlined"
               fullWidth
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
 
             <Button
@@ -114,6 +142,21 @@ const Login = () => {
           </CardContent>
         </Card>
       </Box>
+      
+      <Snackbar 
+        open={!!error} 
+        autoHideDuration={6000} 
+        onClose={() => setError(null)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={() => setError(null)} 
+          severity="error" 
+          sx={{ width: '100%' }}
+        >
+          {error}
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   )
 }

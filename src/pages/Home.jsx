@@ -6,6 +6,7 @@ import { addShop } from '../redux/features/shop/shopSlice'
 import { useNavigate } from 'react-router-dom'
 import CardComponent from '../components/CardComponent'
 import ShoppingCart from '../components/ShoppingCart'
+import { useSession } from '../hooks/SessionContext'
 import { 
   AppBar, 
   Toolbar, 
@@ -18,6 +19,7 @@ import {
   Badge
 } from '@mui/material'
 import { ShoppingCart as ShoppingCartIcon, AccountCircle, Search } from '@mui/icons-material'
+import Supabase from '../db/supabase'
 
 const Home = () => {
   const navigate = useNavigate()
@@ -25,7 +27,7 @@ const Home = () => {
   const [anchorEl, setAnchorEl] = useState(null)
   const [cartOpen, setCartOpen] = useState(false)
 
-  const { username } = useSelector((state) => state.login)
+  const { session } = useSession()
   const { store } = useSelector(state => state.store)
   const { totalQuantity } = useSelector(state => state.shop)
 
@@ -41,10 +43,15 @@ const Home = () => {
     setAnchorEl(null)
   }
 
-  const handleLogout = () => {
-    dispatch(logout())
-    handleMenuClose()
-    navigate('/login')
+  const handleLogout = async () => {
+    try {
+      await Supabase.auth.signOut()
+      dispatch(logout())
+      handleMenuClose()
+      navigate('/login')
+    } catch (error) {
+      console.error('Çıkış yapılırken hata oluştu:', error)
+    }
   }
 
   const handleProfile = () => {
@@ -64,7 +71,8 @@ const Home = () => {
 
   useEffect(() => {
     dispatch(getStore())
-  }, [])
+    console.log(session)
+  }, [dispatch])
 
   return (
     <div>
@@ -93,7 +101,7 @@ const Home = () => {
           >
             <AccountCircle />
           </IconButton>
-          <Typography variant="h6">Hoşgeldin {username || 'Misafir'}</Typography>
+          <Typography variant="h6">Hoşgeldin {session?.user?.user_metadata?.username || 'Misafir'}</Typography>
         </Toolbar>
       </AppBar>
 
@@ -102,7 +110,7 @@ const Home = () => {
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        {username ? (
+        {session ? (
           <>
             <MenuItem onClick={handleProfile}>Profilim</MenuItem>
             <MenuItem onClick={handleOrders}>Siparişlerim</MenuItem>
