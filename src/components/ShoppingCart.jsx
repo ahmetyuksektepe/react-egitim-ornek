@@ -17,10 +17,10 @@ import {
 } from '@mui/material'
 import { Add, Remove, Delete } from '@mui/icons-material'
 import { removeShop, addShop, deleteShop, removeAllShop } from '../redux/features/shop/shopSlice'
-import { addOrder } from '../redux/features/orders/ordersSlice'
 
 const ShoppingCart = ({ open, onClose }) => {
   const dispatch = useDispatch()
+
   const { items, totalQuantity, totalAmount } = useSelector((state) => state.shop)
   const [showAlert, setShowAlert] = useState(false)
 

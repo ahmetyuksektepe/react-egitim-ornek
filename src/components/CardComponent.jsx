@@ -1,6 +1,5 @@
 import React from 'react'
 import { Card, CardContent, CardActions, CardMedia, Button, Typography, Box } from '@mui/material';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 const CardComponent = ({id, image, title, price, description, category, count, rate, addCard}) => {

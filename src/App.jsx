@@ -15,13 +15,11 @@ function App() {
   const [loading, setLoading] = useState(true)
   
   useEffect(() => {
-    // Check current session on mount
     Supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setLoading(false)
     })
 
-    // Listen for auth changes
     const {data: { subscription }} = Supabase.auth.onAuthStateChange(
       (event, session) => {
         if (event === 'SIGNED_OUT') {
@@ -33,7 +31,7 @@ function App() {
     return () => {
       subscription.unsubscribe()
     }
-  }, [])
+    }, [])
 
   if (loading) {
     return <div>Loading...</div>
@@ -41,17 +39,17 @@ function App() {
 
   return (
     <SessionContext.Provider value={{ session, setSession }}>
-      <Router>
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/login' element={<Login/>} />
-          <Route path='/register' element={<Register />} />
-          <Route path='/profile' element={<Profile />} />
-          <Route path='/orders' element={<Orders />} />
-          <Route path='/shop' element={<Shop />} />
-          <Route path='/details/:id' element={<Details />} />
-        </Routes>
-      </Router>
+    <Router>
+      <Routes>
+        <Route path='/' element={<Home />} />
+        <Route path='/login' element={<Login/>} />
+        <Route path='/register' element={<Register />} />
+        <Route path='/profile' element={<Profile />} />
+        <Route path='/orders' element={<Orders />} />
+        <Route path='/shop' element={<Shop />} />
+        <Route path='/details/:id' element={<Details />} />
+      </Routes>
+    </Router>
     </SessionContext.Provider>
   )
 }

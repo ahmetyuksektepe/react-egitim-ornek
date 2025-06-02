@@ -1,12 +1,14 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Box, Typography, Card, CardContent, Grid } from '@mui/material'
-
+import Header from '../components/Header'
 const Orders = () => {
   const { orders, totalQuantity, totalAmount } = useSelector((state) => state.orders)
   console.log(orders)
 
   return (
+    <>
+    <Header />
     <Box sx={{ p: 4 }}>
       <Typography variant="h4" sx={{ mb: 4 }}>My Orders</Typography>
       
@@ -37,6 +39,7 @@ const Orders = () => {
         </Grid>
       )}
     </Box>
+    </>
   )
 }
 
